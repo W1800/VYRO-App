@@ -18,6 +18,13 @@ app.get("/", (req, res) => {
   res.send("VYRO Backend is running!");
 });
 
+app.get("/version", (req, res) => {
+  res.json({
+    version: "v1.0.0",
+    apkUrl: "https://github.com/W1800/VYRO/releases/download/v1.0.0/VYRO-latest.apk"
+  });
+});
+
 app.post("/api/download", async (req, res) => {
   try {
     const { url } = req.body;
