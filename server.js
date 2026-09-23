@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
 app.get("/version", (req, res) => {
   res.json({
     version: "v1.0.0",
-    apkUrl: "https://github.com/W1800/VYRO/releases/download/v1.0.0/VYRO-latest.apk"
+    apkUrl: "https://github.com/W1800/VYRO-App/releases/download/v1.0.0/VYRO-latest.apk"
   });
 });
 
