@@ -1,6 +1,6 @@
 async function checkForUpdates() {
     try {
-        const response = await fetch('https://api.github.com/repos/W1800/VYRO-App/releases/latest');
+        const response = await fetch('https://api.github.com/repos/W1800/VYRO/releases/latest');
         const data = await response.json();
         const latestVersion = data.tag_name;
         const currentVersion = "v1.0";
