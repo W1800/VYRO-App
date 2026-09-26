@@ -137,6 +137,7 @@ app.post("/api/instagram-download", async (req, res) => {
     );
 
     const data = await response.json();
+    console.log("EasyDown response:", JSON.stringify(data));
 
     if (
       !data.data ||
