@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
+const { execFile } = require("child_process");
 const app = express();
 app.set("trust proxy", 1);
 
@@ -113,56 +114,29 @@ app.get("/api/download-file", async (req, res) => {
   }
 });
 
-// Instagram Downloader
+// Instagram Downloader - yt-dlp
 app.post("/api/instagram-download", async (req, res) => {
-  try {
-    const { url } = req.body;
+  const { url } = req.body;
 
-    if (!url || !url.includes("instagram.com")) {
-      return res.status(400).json({
-        error: "ضع رابط Instagram صحيح"
-      });
-    }
-
-    const response = await fetch(
-      "https://api.easydown.org/api/v1/platforms/instagram/parse",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.EASYDOWN_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ url })
-      }
-    );
-
-    const data = await response.json();
-    console.log("EasyDown response:", JSON.stringify(data));
-
-    if (
-      !data.data ||
-      !data.data.media ||
-      !data.data.media.videos ||
-      !data.data.media.videos[0]
-    ) {
-      return res.status(400).json({
-        error: "تعذر الحصول على فيديو Instagram"
-      });
-    }
-
-    res.json({
-      success: true,
-      video: data.data.media.videos[0].url
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "حدث خطأ أثناء معالجة Instagram"
-    });
+  if (!url || !url.includes("instagram.com")) {
+    return res.status(400).json({ error: "رابط Instagram غير صحيح" });
   }
+
+  execFile("yt-dlp", ["-g", "--no-playlist", url], { timeout: 30000 }, (error, stdout) => {
+    if (error) {
+      console.error("yt-dlp error:", error.message);
+      return res.status(500).json({ error: "تعذر جلب فيديو Instagram" });
+    }
+
+    const video = stdout.trim().split("\n")[0];
+    if (!video) {
+      return res.status(500).json({ error: "لم يتم العثور على الفيديو" });
+    }
+
+    res.json({ success: true, video });
+  });
 });
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
